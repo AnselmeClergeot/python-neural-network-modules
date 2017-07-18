@@ -10,19 +10,14 @@ class Layer :
 
 	def calculateOutput(self, X) :
 
-		print("X:", X)
-
 		dotProduct = np.dot(np.append(X, 1), self.W)
 		
 		self.output = self.sigmoid(dotProduct)
 
-		print("OUTPUT:", self.output)
-
 		return self.output
-
-	def cost(X, Y) :
-		return 1/2 * np.multiply(Y - X, Y - X)
-
 
 	def sigmoid(self, output) :
 		return 1 / (1 + np.exp(-output))
+
+	def sigmoidDerivative(self) :
+		return self.output * (1 - self.output)

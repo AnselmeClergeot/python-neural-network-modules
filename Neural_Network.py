@@ -17,34 +17,46 @@ class Neural_Network :
 
 		return X
 
-	def computeGradients(self, X, Y) :
+	def backward(self, X, Y, learningRate) :
+		self.computeErrors(X, Y)
+		self.updateWeights(X, learningRate)
+
+	def setAllWeights(self, WList) :
+		for i in range(len(self.layers)) :
+			self.layers[i].W = WList
+
+	def getAllWeights(self) :
+		WList = []
+		for i in range(len(self.layers)) :
+			WList.append(self.layers[i].W)	
+
+	def computeErrors(self, X, Y) :
+		outputLayer = self.layers[-1]
+	
 		y = self.forward(X)
 
-		outputLayer = self.layers[-1]
-		outputLayer.gradients = np.multiply(self.sigmoidDerivative(outputLayer.output), Y - y)
+		outputLayer.error = np.multiply( outputLayer.sigmoidDerivative(), Y - y)
 
-		for i in range(0, len(self.layers)-1) :
+		for i in reversed(range(0, len(self.layers)-1)) :
 			currentLayer = self.layers[i]
 			nextLayer = self.layers[i+1]
 
-			nextLayerTransposedW = nextLayer.W.T[:]
-			nextLayerTransposedW = np.delete(nextLayerTransposedW, -1, 1)
+			weights = np.delete(nextLayer.W, -1, 0)
+			errorCol = nextLayer.error.reshape(len(nextLayer.error), 1)
+			
+			layerDerivative = currentLayer.sigmoidDerivative().reshape(len(currentLayer.sigmoidDerivative()), 1)
 
-			currentLayer.gradients = np.multiply(self.sigmoidDerivative(currentLayer.output),np.dot(nextLayer.gradients, nextLayerTransposedW))
+			currentLayer.error = np.multiply(layerDerivative, np.dot(weights, errorCol))			
 
 	def updateWeights(self, X, learningRate) :
 		for i in range(len(self.layers)) :
 			currentLayer = self.layers[i]
 
-			transposedInput = np.asmatrix(np.append(X, 1)).T[:]
+			inputsCol = np.append(np.asarray(X), 1).reshape(len(X)+1, 1)
+			error = currentLayer.error.reshape(1, len(currentLayer.error))
 
-			currentLayer.W = np.add(currentLayer.W, np.multiply(learningRate, np.dot(transposedInput, np.asmatrix(currentLayer.gradients))))
+			gradients = np.dot(inputsCol, error)
+
+			currentLayer.W = np.add(currentLayer.W, np.multiply(learningRate, gradients))
 
 			X = currentLayer.output
-
-	def backward(self, X, Y, learningRate) :
-		self.computeGradients(X, Y)
-		self.updateWeights(X, learningRate)
-
-	def sigmoidDerivative(self, output) :
-		return 1 * (1 - output)

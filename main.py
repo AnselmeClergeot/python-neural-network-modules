@@ -2,23 +2,26 @@
 
 from Neural_Network import *
 
-NN = Neural_Network(2, 3, 1)
+NN = Neural_Network(2, 2, 1)
 
-examples = [
+t = [
 	[0, 0],
 	[1, 1],
 	[0, 1],
 	[1, 0]
 ]
 
-expected = [
+e = [
 	[0],
 	[0],
 	[1],
 	[1]
 ]
 
-for i in range(10000) :
+for i in range(5000) :
 	for j in range(4) :
-		NN.backward(examples[j], expected[j], 0.2)
+		NN.backward(t[j], e[j], 0.2)
 
+for ex in t :
+	print(ex)
+	print(NN.forward(ex))
