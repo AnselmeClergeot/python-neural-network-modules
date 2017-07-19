@@ -1,32 +1,45 @@
 #coding: utf-8
 
 from Neural_Network import *
+from mnist import MNIST
 
-NN = Neural_Network(2, 2, 1)
+def fromClassToOutput(classValue) :
+	output = [0] * 10
+	output[classValue] = 1
+	return output
+
+def fromOutputToClass(output) :
+	return output.argmax()
+
+imageWidth = 28
+numberOfClasses = 10
+
+print("Creating neural network...")
+NN = Neural_Network(imageWidth**2, 80, numberOfClasses)
 NN.loadFromFile("networkConfig")
 
-t = [
-	[0, 0],
-	[1, 1],
-	[0, 1],
-	[1, 0]
-]
+print("Done.")
+print("Loading dataset...")
 
-e = [
-	[0],
-	[0],
-	[1],
-	[1]
-]
+database = MNIST("database")
+images, expected = database.load_training()
 
-#for i in range(50000) :
-#	for j in range(4) :
-#		NN.backward(t[j], e[j], 0.2)
+print("Done.")
+print("Starting learning...")
 
-for training in t :
-	print(training)
-	print(NN.forward(training))
-	
-NN.saveToFile("networkConfig")
+for image in images :
+	print(database.display(image))
+	print("Network thinks it's a {}.".format(fromOutputToClass(NN.forward([normalize(x, 255) for x in image]))))
+	raw_input()
 
-print(unnormalize(normalize(87, 199), 199))
+for epoch in range(100) :
+	for i in range(len(images)) :
+		normalizedImage = [normalize(greyScale, 255) for greyScale in images[i]]
+		NN.backward(normalizedImage, fromClassToOutput(expected[i]), 0.2)
+
+		if i != 0 :
+			if i % 100 == 0 :
+				print("Epoch {} : {} images learned.".format(epoch, i))
+		if i % 5000 == 0 :
+			NN.saveToFile("networkConfig")
+			print("Network configuration saved !")

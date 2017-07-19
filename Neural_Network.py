@@ -4,11 +4,8 @@ from Layer import Layer
 import numpy as np
 import pickle
 
-def normalize(x, maxX) :
-	return x/float(maxX)
-
-def unnormalize(normalizedX, maxX) :
-	return normalizedX * maxX
+def normalize(x, xMax) :
+	return x/float(xMax)
 
 class Neural_Network :
 	"""
@@ -21,7 +18,7 @@ class Neural_Network :
 			Each parameter describes how many neurons they are in the current layer.
 		"""
 		self.layers = []
-		self.gradients = []
+		self.gradients = [None] * (len(layerSizes) - 1)
 
 		for i in range(1, len(layerSizes)) :
 			self.layers.append(Layer(layerSizes[i-1], layerSizes[i]))
@@ -172,7 +169,7 @@ class Neural_Network :
 
 			gradients = np.dot(inputsCol, errorLine)
 
-			self.gradients.append(gradients)
+			self.gradients[i] = gradients
 
 			currentLayer.W = np.add(currentLayer.W, np.multiply(learningRate, gradients))
 
