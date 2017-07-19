@@ -2,6 +2,10 @@
 
 from Layer import Layer
 import numpy as np
+import pickle
+
+def normalize(x, maxX) :
+	return x/float(maxX)
 
 class Neural_Network :
 	"""
@@ -18,6 +22,27 @@ class Neural_Network :
 
 		for i in range(1, len(layerSizes)) :
 			self.layers.append(Layer(layerSizes[i-1], layerSizes[i]))
+
+	def saveToFile(self, filePath) :
+		"""
+			Save the network weights to a file.
+		"""
+		weights = []
+		for layer in self.layers :
+			weights.append(layer.W)
+
+		with open(filePath, "wb") as saveFile :
+			pickle.dump(weights, saveFile)	
+
+	def loadFromFile(self, filePath) :
+		"""	
+			Load the weights configuration we saved previously.
+		"""
+		with open(filePath, "rb") as saveFile :
+			weights = pickle.load(saveFile)
+
+			for i in range(len(self.layers)) :
+				self.layers[i].W = weights[i]
 
 	def forward(self, X) :
 		"""
