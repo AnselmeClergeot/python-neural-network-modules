@@ -28,3 +28,5 @@ for training in t :
 	print(NN.forward(training))
 	
 NN.saveToFile("networkConfig")
+
+print(unnormalize(normalize(87, 199), 199))

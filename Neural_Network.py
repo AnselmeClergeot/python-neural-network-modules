@@ -7,6 +7,9 @@ import pickle
 def normalize(x, maxX) :
 	return x/float(maxX)
 
+def unnormalize(normalizedX, maxX) :
+	return normalizedX * maxX
+
 class Neural_Network :
 	"""
 		Class used to manipulate a feed-forward neural network.
